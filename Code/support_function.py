@@ -119,28 +119,30 @@ def plot_distribution_comp(var, nrow=2):
         plt.tick_params(axis='both', which='major', labelsize=12)
     plt.show()
 
-def normalization(macv):
+def normalization(input):
+    patterns = {}
+    macv = input
     for i in range(macv.__len__()):
-    line = macv[i].rstrip()
-    line = re.sub('(\s{2,})', ' ', line)
-    line = line.lower()
-    words = re.split(r" ", line, flags=re.UNICODE)
-    if words.__len__() >= 2:
-        if (words[0]) not in patterns:
-            try:
-                key = str(words[0][0]) + str(words[1][0])
-                if key not in patterns:
-                    value = words[0] + " " + words[1]
-                    patterns[key] = value
-            except Exception:
-                print("ERROR:" + str(i))
-                pprint.pprint(words)
-        else:
-            key = words[0]
-            
-            value = patterns[key]
-        current_pattern = re.compile(rf"({key}.*)|"
-                                    rf"({value}.+)", flags=re.IGNORECASE)
-        if current_pattern.match(line):
-            print(str(i) + "\t" + line + "-> " + patterns[key])
-            time.sleep(1)
+        line = macv[i].rstrip()
+        line = re.sub('(\s{2,})', ' ', line)
+        line = line.lower()
+        words = re.split(r" ", line, flags=re.UNICODE)
+        if words.__len__() >= 2:
+            if (words[0]) not in patterns:
+                try:
+                    key = str(words[0][0]) + str(words[1][0])
+                    if key not in patterns:
+                        value = words[0] + " " + words[1]
+                        patterns[key] = value
+                except Exception:
+                    print("ERROR:" + str(i))
+                    pprint.pprint(words)
+            else:
+                key = words[0]
+                
+                value = patterns[key]
+            current_pattern = re.compile(rf"({key}.*)|"
+                                        rf"({patterns[key]}.*)", flags=re.IGNORECASE)
+            if current_pattern.match(line):
+                macv[i] = patterns[key]
+    return macv

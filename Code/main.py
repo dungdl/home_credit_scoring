@@ -6,7 +6,7 @@ from support_function import *
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-import re
+import time
 import pprint
 
 
@@ -42,5 +42,7 @@ def exam_missing_value():
 # plot_stats(application_train, 'maCv', label_rotation=True, horizontal_layout=False)
 
 macv = application_train['maCv']
+macv = macv.replace(np.nan, '', regex=True)
+edit_macv = normalization(macv)
 
-
+application_train = application_train.assign(maCv=edit_macv)
