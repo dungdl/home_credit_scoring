@@ -119,30 +119,49 @@ def plot_distribution_comp(var, nrow=2):
         plt.tick_params(axis='both', which='major', labelsize=12)
     plt.show()
 
+
 def normalization(input):
-    patterns = {}
     macv = input
+    patterns = {}
+
+    f = open("patterns.txt", "r", encoding='utf-8')
+    i = 0
+    for line in f:
+        line = re.sub(r'\n', '', line, flags=re.UNICODE)
+        words = re.split(r':', line, flags=re.UNICODE)
+        patterns[words[0]] = words[1]
+    f.close()
+
     for i in range(macv.__len__()):
         line = macv[i].rstrip()
         line = re.sub('(\s{2,})', ' ', line)
         line = line.lower()
-        words = re.split(r" ", line, flags=re.UNICODE)
-        if words.__len__() >= 2:
-            if (words[0]) not in patterns:
-                try:
-                    key = str(words[0][0]) + str(words[1][0])
-                    if key not in patterns:
-                        value = words[0] + " " + words[1]
-                        patterns[key] = value
-                except Exception:
-                    print("ERROR:" + str(i))
-                    pprint.pprint(words)
-            else:
-                key = words[0]
-                
-                value = patterns[key]
-            current_pattern = re.compile(rf"({key}.*)|"
-                                        rf"({patterns[key]}.*)", flags=re.IGNORECASE)
-            if current_pattern.match(line):
-                macv[i] = patterns[key]
+        match = False
+        rep = "{,1}"
+
+        for k in patterns:
+            if re.match(rf"(.*{k[0]}[. ]{rep}{k[1]}.*)", line, flags=re.UNICODE):
+                macv[i] = patterns[k]
+                match = True
+                break
+        if not match:
+            words = re.split(r" ", line, flags=re.UNICODE)
+            if words.__len__() >= 2:
+                if (words[0]) not in patterns:
+                    try:
+                        key = str(words[0][0]) + str(words[1][0])
+                        if key in patterns:
+                            value = patterns[key]
+                    except Exception:
+                        print("ERROR:" + str(i))
+                        pprint.pprint(words)
+                else:
+                    key = words[0]
+                    value = patterns[key]
+
+                if key in patterns:
+                    current_pattern = re.compile(rf"(.*{key[0]}[. ]{rep}{key[1]}.*)|"
+                                                 rf"({value}.*)", flags=re.IGNORECASE)
+                    if current_pattern.match(line):
+                        macv[i] = patterns[k]
     return macv

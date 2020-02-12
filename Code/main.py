@@ -42,7 +42,24 @@ def exam_missing_value():
 # plot_stats(application_train, 'maCv', label_rotation=True, horizontal_layout=False)
 
 macv = application_train['maCv']
+ori = application_train['maCv']
 macv = macv.replace(np.nan, '', regex=True)
 edit_macv = normalization(macv)
 
 application_train = application_train.assign(maCv=edit_macv)
+edit_macv = application_train['maCv']
+
+# plot_stats(application_train, 'maCv', label_rotation=True, horizontal_layout=False)
+
+f = open("macv.txt", "w", encoding='utf-8')
+for m in edit_macv:
+    f.write(m)
+    f.write("\n")
+f.close()
+
+f = open("ori.txt", "w", encoding='utf-8')
+ori = ori.replace(np.nan, '', regex=True)
+for m in ori:
+    f.write(m)
+    f.write("\n")
+f.close()
